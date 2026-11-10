@@ -1,0 +1,1501 @@
+/* =========================================================
+   STEEL LAB 3D
+   DISEÑO GENERAL DEL LABORATORIO VIRTUAL DE ACEROS
+   ========================================================= */
+
+/* 1. FUENTES Y VARIABLES */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    --background: #080d14;
+    --background-light: #0d1621;
+    --panel: #101925;
+    --panel-light: #162333;
+    --panel-hover: #1c2b3b;
+    --border: #263548;
+    --border-light: #344960;
+    --text: #edf3fa;
+    --muted: #8998aa;
+    --orange: #ff8738;
+    --orange-light: #ffab70;
+    --orange-dark: #d65320;
+    --blue: #3989c9;
+    --blue-light: #56b5f0;
+    --green: #43d69b;
+    --red: #ff5c5c;
+    --radius: 10px;
+    --shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+}
+
+/* 2. RESETEO GENERAL */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 25px;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(
+            ellipse at top right,
+            #142438 0%,
+            transparent 35%
+        ),
+        var(--background);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+}
+
+::selection {
+    background: #ff873855;
+    color: white;
+}
+
+/* 3. BARRA LATERAL */
+
+.sidebar {
+    width: 255px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    padding: 28px 18px;
+    background: rgba(12, 20, 31, 0.97);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 55px;
+}
+
+.logo-icon {
+    background: linear-gradient(135deg, #ff9a48, #d65320);
+    color: #10151c;
+    font-weight: 900;
+    padding: 12px;
+    border-radius: 9px;
+    box-shadow: 0 0 20px #ff873833;
+}
+
+.logo h2 {
+    font-size: 16px;
+    margin: 0;
+    font-weight: 800;
+}
+
+.logo h2 span {
+    color: var(--orange);
+}
+
+.logo small,
+.eyebrow,
+.menu-title {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+}
+
+.menu-title {
+    margin: 0 0 15px 10px;
+}
+
+/* Navegación */
+
+nav {
+    display: grid;
+    gap: 8px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #a9b6c6;
+    padding: 14px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    transition: all 0.25s ease;
+}
+
+nav a:hover,
+nav a.active {
+    background: #1b2a3b;
+    color: white;
+}
+
+nav a:hover {
+    transform: translateX(3px);
+}
+
+nav a.active {
+    border-left: 3px solid var(--orange);
+    color: var(--orange-light);
+    background: linear-gradient(90deg, #ff87381c, #1b2a3b);
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+    padding: 15px 5px;
+    border-top: 1px solid var(--border);
+    color: #a9b6c6;
+    font-size: 10px;
+}
+
+.sidebar-bottom small {
+    float: right;
+}
+
+/* Indicadores */
+
+.status-dot,
+.live-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    margin-right: 7px;
+    box-shadow: 0 0 9px #43d69b88;
+}
+
+/* 4. CONTENIDO PRINCIPAL */
+
+.main-content {
+    margin-left: 255px;
+    padding: 35px 42px;
+    max-width: 1700px;
+    min-height: 100vh;
+}
+
+/* 5. BARRA SUPERIOR */
+
+.topbar,
+.section-heading,
+.viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.topbar {
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.topbar h1 {
+    font-size: 23px;
+    margin: 5px 0;
+    font-weight: 800;
+}
+
+.top-status,
+.step-label,
+.viewer-tag {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: #9eafc1;
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    border-radius: 5px;
+    background: #111d2a;
+}
+
+/* 6. PANEL DE BIENVENIDA */
+
+.welcome {
+    margin-top: 32px;
+    padding: 35px;
+    min-height: 190px;
+    border: 1px solid #35465a;
+    border-radius: 12px;
+    background: linear-gradient(
+        110deg,
+        #172a3c,
+        #101925 65%,
+        #34251d
+    );
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--shadow);
+}
+
+.welcome::after {
+    content: "";
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    right: 10%;
+    border-radius: 50%;
+    border: 1px solid #ffffff0b;
+    box-shadow:
+        0 0 0 30px #ffffff05,
+        0 0 0 60px #ffffff03;
+    pointer-events: none;
+}
+
+.orange-text {
+    color: var(--orange);
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.welcome h2 {
+    font-size: clamp(25px, 3vw, 38px);
+    margin: 12px 0;
+    font-weight: 900;
+}
+
+.welcome p:last-child {
+    color: #a9b6c6;
+    font-size: 12px;
+    line-height: 1.8;
+    max-width: 540px;
+}
+
+.welcome-number {
+    font-size: 95px;
+    font-weight: 800;
+    color: #ffffff12;
+    user-select: none;
+}
+
+/* 7. ENCABEZADOS DE SECCIONES */
+
+.section-heading {
+    margin: 38px 0 17px;
+    scroll-margin-top: 25px;
+}
+
+.section-heading h2 {
+    font-size: 19px;
+    margin: 5px 0;
+    font-weight: 800;
+}
+
+.section-heading p {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* 8. TARJETAS DE MATERIALES */
+
+.material-grid,
+.study-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.material-card,
+.study-card,
+.viewer-card,
+.control-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 19px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+}
+
+.material-card {
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    user-select: none;
+}
+
+.material-card:hover {
+    border-color: var(--orange);
+    transform: translateY(-4px);
+    background: #1a2735;
+}
+
+.material-card.selected {
+    border: 2px solid var(--orange);
+    background: linear-gradient(135deg, #263342, #182432);
+    box-shadow: 0 0 18px #ff873833;
+}
+
+.material-card.selected::after {
+    content: "✓ MATERIAL SELECCIONADO";
+    display: block;
+    color: var(--orange);
+    font-size: 9px;
+    font-weight: 800;
+    margin-top: 15px;
+    letter-spacing: 1px;
+}
+
+.material-code {
+    color: var(--orange);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.material-card h3,
+.study-card h3 {
+    font-size: 14px;
+    margin: 13px 0 8px;
+}
+
+.material-card p,
+.study-card p {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.material-detail,
+.study-card span {
+    color: #71859b;
+    font-size: 9px;
+    letter-spacing: 1px;
+}
+
+/* 9. DISTRIBUCIÓN DE LABORATORIOS */
+
+.lab-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1.7fr)
+        minmax(250px, 0.9fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.viewer-card,
+.control-card {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.viewer-header {
+    margin-bottom: 15px;
+}
+
+.viewer-header h3,
+.control-card h3 {
+    font-size: 14px;
+    margin: 0 0 6px;
+    font-weight: 800;
+}
+
+.viewer-header p {
+    font-size: 9px;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.viewer-tag {
+    white-space: nowrap;
+}
+
+/* 10. VISORES 3D */
+
+#steel-viewer,
+#furnace-viewer,
+#tensile-viewer,
+#hardness-viewer {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    background: radial-gradient(
+        ellipse at center,
+        #24384b,
+        #0a111b 75%
+    );
+    border: 1px solid #26394d;
+}
+
+#steel-viewer {
+    height: 360px;
+}
+
+#furnace-viewer {
+    height: 430px;
+}
+
+#tensile-viewer {
+    height: 480px;
+}
+
+#hardness-viewer {
+    height: 450px;
+}
+
+#steel-viewer canvas,
+#furnace-viewer canvas,
+#tensile-viewer canvas,
+#hardness-viewer canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    outline: none;
+}
+
+.loading-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.viewer-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: 9px;
+    padding-top: 14px;
+}
+
+/* 11. TARJETAS DE CONTROL */
+
+.control-card label {
+    display: block;
+    color: #a9b6c6;
+    font-size: 10px;
+    margin: 18px 0 9px;
+    font-weight: 600;
+}
+
+.temperature-value {
+    color: var(--orange);
+}
+
+.temperature-value strong {
+    font-size: 32px;
+}
+
+.temperature-value span {
+    font-size: 14px;
+}
+
+.parameter-value {
+    font-size: 15px;
+}
+
+/* 12. SELECTORES Y CAMPOS */
+
+select,
+input[type="number"],
+input[type="text"],
+textarea {
+    width: 100%;
+    background: #0b1420;
+    color: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 11px;
+    outline: none;
+    font-size: 11px;
+    transition: border 0.2s ease;
+}
+
+select:hover,
+input:hover,
+textarea:hover {
+    border-color: #536d88;
+}
+
+select:focus,
+input:focus,
+textarea:focus {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 2px #ff873822;
+}
+
+select option {
+    background: #101925;
+    color: white;
+}
+
+input[type="range"] {
+    width: 100%;
+    accent-color: var(--orange);
+    cursor: pointer;
+}
+
+/* 13. BOTONES GENERALES */
+
+button {
+    transition:
+        background 0.2s ease,
+        border 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#simulate-button,
+#start-furnace,
+#start-tensile,
+#start-hardness {
+    background: linear-gradient(
+        135deg,
+        var(--orange),
+        var(--orange-dark)
+    );
+    color: #171717;
+    font-weight: 900;
+    border: none;
+    border-radius: 6px;
+    padding: 13px 17px;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+}
+
+#simulate-button {
+    width: 100%;
+    margin-top: 23px;
+}
+
+#simulate-button:hover,
+#start-furnace:hover,
+#start-tensile:hover,
+#start-hardness:hover {
+    background: var(--orange-light);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 18px #ff873844;
+}
+
+#stop-furnace,
+#reset-tensile,
+#reset-hardness {
+    background: #1b2a3b;
+    color: #dce7f2;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+#stop-furnace:hover,
+#reset-tensile:hover,
+#reset-hardness:hover {
+    background: #293b50;
+    border-color: var(--blue);
+}
+
+#furnace-door {
+    background: #1b2a3b;
+    color: var(--blue-light);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+#furnace-door:hover {
+    background: #24384d;
+    border-color: var(--blue);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 14. BOTONES DEL HORNO */
+
+.furnace-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.furnace-buttons button {
+    flex: 1;
+    min-width: 120px;
+}
+
+/* 15. PANEL DE TEMPERATURA */
+
+#furnace-temperature {
+    color: var(--orange);
+    font-size: 30px;
+    font-weight: 900;
+    text-shadow: 0 0 15px #ff873844;
+}
+
+#furnace-state {
+    display: inline-block;
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-top: 8px;
+    padding: 7px 10px;
+    background: #43d69b12;
+    border: 1px solid #43d69b33;
+    border-radius: 5px;
+}
+
+/* 16. BARRAS DE PROGRESO */
+
+#furnace-progress,
+#process-progress {
+    width: 0%;
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.15s linear;
+}
+
+#furnace-progress {
+    background: linear-gradient(
+        90deg,
+        #d65320,
+        #ff8738,
+        #ffc078
+    );
+    box-shadow: 0 0 12px #ff873855;
+}
+
+#process-progress {
+    background: linear-gradient(
+        90deg,
+        #267bb8,
+        #3989c9,
+        #56b5f0
+    );
+    box-shadow: 0 0 12px #3989c955;
+}
+
+.progress-container,
+.progress-track {
+    width: 100%;
+    height: 9px;
+    background: #263548;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 9px;
+}
+
+/* 17. CONTROLES DEL CICLO TÉRMICO */
+
+#treatment-description,
+#furnace-status,
+#treatment-stage {
+    font-size: 10px;
+    line-height: 1.7;
+    color: #a9b6c6;
+}
+
+#treatment-description {
+    padding: 12px;
+    background: #152333;
+    border-left: 3px solid var(--orange);
+    border-radius: 5px;
+    margin-top: 12px;
+}
+
+#treatment-stage {
+    color: var(--orange-light);
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    margin-top: 14px;
+}
+
+#furnace-status {
+    padding: 12px;
+    background: #0b1420;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-top: 12px;
+}
+
+#process-time {
+    font-size: 25px;
+    font-weight: 900;
+    color: var(--blue-light);
+    font-variant-numeric: tabular-nums;
+}
+
+#process-progress-text,
+#furnace-progress-text {
+    color: var(--orange-light);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.simulation-note {
+    color: var(--muted);
+    font-size: 9px;
+    line-height: 1.7;
+    margin-top: 15px;
+}
+
+/* 18. TARJETAS DE ESTUDIO Y MICROESTRUCTURAS */
+
+.study-card {
+    min-height: 140px;
+    transition: all 0.2s ease;
+}
+
+.study-card:hover {
+    border-color: var(--blue);
+    transform: translateY(-3px);
+    background: var(--panel-light);
+}
+
+.study-card h3 {
+    color: var(--blue-light);
+}
+
+/* 19. ENSAYO DE TRACCIÓN */
+
+#tensile-status {
+    color: var(--orange-light);
+    font-size: 10px;
+    line-height: 1.7;
+    margin-top: 12px;
+}
+
+#tensile-chart {
+    width: 100%;
+    min-height: 220px;
+    background: #0b1420;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 15px;
+    display: block;
+}
+
+#current-stress,
+#current-strain {
+    color: var(--blue-light);
+    font-size: 22px;
+    font-weight: 800;
+}
+
+#material-state {
+    color: var(--orange-light);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+/* 20. ENSAYO DE DUREZA */
+
+#hardness-status {
+    color: var(--orange-light);
+    font-size: 10px;
+    line-height: 1.7;
+    margin-top: 12px;
+}
+
+#hardness-result {
+    background: #142334;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 17px;
+    margin-top: 15px;
+}
+
+#hardness-value {
+    color: var(--orange);
+    font-size: 30px;
+    font-weight: 900;
+}
+
+#hardness-state {
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+#hardness-graph {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 7px;
+    background: #0b1420;
+}
+
+/* 21. INFORMACIÓN Y RESULTADOS */
+
+.result-card,
+.info-card,
+.data-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 18px;
+}
+
+.result-card h3,
+.info-card h3,
+.data-card h3 {
+    font-size: 13px;
+    margin-top: 0;
+}
+
+.result-card p,
+.info-card p,
+.data-card p {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+/* 22. TABLAS */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+    background: var(--panel);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th,
+td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+th {
+    background: #192a3c;
+    color: var(--orange-light);
+    font-weight: 800;
+}
+
+td {
+    color: #c3cfdb;
+}
+
+tr:hover td {
+    background: #172536;
+}
+
+/* 23. MENSAJES Y AVISOS */
+
+.simulation-note,
+.warning-message,
+.success-message {
+    line-height: 1.7;
+}
+
+.warning-message {
+    color: #ffc078;
+    background: #ff873812;
+    border-left: 3px solid var(--orange);
+    padding: 12px;
+}
+
+.success-message {
+    color: var(--green);
+    background: #43d69b12;
+    border-left: 3px solid var(--green);
+    padding: 12px;
+}
+
+/* 24. PIE DE PÁGINA */
+
+footer {
+    margin-top: 40px;
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+    color: #65758a;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+/* 25. BARRAS DE DESPLAZAMIENTO */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0b1420;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #344960;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #536d88;
+}
+
+/* 26. RESPONSIVE - TABLETS */
+
+@media (max-width: 1100px) {
+    .sidebar {
+        width: 220px;
+    }
+
+    .main-content {
+        margin-left: 220px;
+        padding: 28px 24px;
+    }
+
+    .lab-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .material-grid,
+    .study-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 27. RESPONSIVE - PANTALLAS MEDIANAS */
+
+@media (max-width: 950px) {
+    .sidebar {
+        width: 190px;
+    }
+
+    .main-content {
+        margin-left: 190px;
+        padding: 25px 20px;
+    }
+
+    .welcome-number {
+        font-size: 70px;
+    }
+
+    #furnace-viewer {
+        height: 390px;
+    }
+}
+
+/* 28. RESPONSIVE - CELULARES */
+
+@media (max-width: 650px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 15px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+        margin-bottom: 15px;
+    }
+
+    nav {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5px;
+    }
+
+    nav a {
+        padding: 11px 8px;
+        font-size: 10px;
+    }
+
+    .sidebar-bottom {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 20px 14px;
+    }
+
+    .material-grid,
+    .study-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .top-status,
+    .step-label {
+        display: none;
+    }
+
+    .topbar h1 {
+        font-size: 18px;
+    }
+
+    .welcome {
+        padding: 22px;
+        min-height: 160px;
+    }
+
+    .welcome-number {
+        font-size: 45px;
+    }
+
+    .welcome h2 {
+        font-size: 25px;
+    }
+
+    .welcome p:last-child {
+        font-size: 10px;
+    }
+
+    .section-heading h2 {
+        font-size: 16px;
+    }
+
+    #steel-viewer {
+        height: 280px;
+    }
+
+    #furnace-viewer {
+        height: 320px;
+    }
+
+    #tensile-viewer {
+        height: 340px;
+    }
+
+    #hardness-viewer {
+        height: 340px;
+    }
+
+    .furnace-buttons {
+        flex-direction: column;
+    }
+
+    .furnace-buttons button {
+        width: 100%;
+    }
+
+    .viewer-header {
+        align-items: flex-start;
+    }
+
+    .viewer-tag {
+        font-size: 8px;
+        padding: 7px;
+    }
+}
+
+/* 29. REDUCIR ANIMACIONES */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
+
+/* =========================================================
+   30. COMPATIBILIDAD CON LA NUEVA INTERFAZ
+   ========================================================= */
+
+.app-container {
+    min-height: 100vh;
+    display: flex;
+}
+
+.menu {
+    display: grid;
+    gap: 8px;
+}
+
+.menu-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 12px;
+    border-radius: 7px;
+    color: #a9b6c6;
+    text-decoration: none;
+    font-size: 12px;
+    transition: all 0.25s ease;
+}
+
+.menu-link:hover,
+.menu-link.active {
+    background: #1b2a3b;
+    color: var(--orange-light);
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 15px 5px;
+    border-top: 1px solid var(--border);
+    color: #a9b6c6;
+    font-size: 10px;
+}
+
+.welcome-section {
+    margin-top: 32px;
+    padding: 35px;
+    min-height: 190px;
+    border: 1px solid #35465a;
+    border-radius: 12px;
+    background: linear-gradient(
+        110deg,
+        #172a3c,
+        #101925 65%,
+        #34251d
+    );
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--shadow);
+}
+
+.welcome-section h2 {
+    font-size: clamp(25px, 3vw, 38px);
+    margin: 12px 0;
+    font-weight: 900;
+}
+
+.welcome-section p {
+    color: #a9b6c6;
+    font-size: 12px;
+    line-height: 1.8;
+    max-width: 540px;
+}
+
+.section-label {
+    color: var(--orange);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.status-card {
+    background: #111d2a;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 12px;
+    color: #9eafc1;
+    font-size: 10px;
+}
+
+.content-section {
+    scroll-margin-top: 25px;
+    margin-top: 35px;
+}
+
+.viewer-status {
+    color: var(--green);
+    font-size: 9px;
+    letter-spacing: 1px;
+}
+
+.material-properties,
+.property-list {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.material-properties span,
+.property-list span {
+    color: #a9b6c6;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.primary-button {
+    background: linear-gradient(
+        135deg,
+        var(--orange),
+        var(--orange-dark)
+    );
+    color: #171717;
+    border: none;
+    border-radius: 6px;
+    padding: 13px 17px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+}
+
+.primary-button:hover {
+    background: var(--orange-light);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 18px #ff873844;
+}
+
+.secondary-button {
+    background: #1b2a3b;
+    color: #dce7f2;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.secondary-button:hover {
+    background: #293b50;
+    border-color: var(--blue);
+}
+
+.main-footer {
+    margin-top: 40px;
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+    color: #65758a;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+/* 31. ENSAYO CHARPY */
+
+#charpy-viewer {
+    width: 100%;
+    height: 430px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    background: radial-gradient(
+        ellipse at center,
+        #24384b,
+        #0a111b 75%
+    );
+    border: 1px solid #26394d;
+}
+
+#charpy-viewer canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#start-charpy,
+#reset-charpy,
+#export-results,
+#clear-results {
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+#start-charpy,
+#export-results {
+    background: linear-gradient(
+        135deg,
+        var(--orange),
+        var(--orange-dark)
+    );
+    color: #171717;
+    border: none;
+}
+
+#reset-charpy,
+#clear-results {
+    background: #1b2a3b;
+    color: #dce7f2;
+    border: 1px solid var(--border);
+}
+
+#charpy-status,
+#charpy-result-text,
+#fe-c-reading,
+#ttt-cct-reading,
+#results-status {
+    color: #a9b6c6;
+    font-size: 10px;
+    line-height: 1.7;
+    margin-top: 12px;
+}
+
+#charpy-energy,
+#charpy-exit-angle {
+    color: var(--orange-light);
+    font-size: 22px;
+    font-weight: 800;
+}
+
+#charpy-result {
+    margin-top: 15px;
+    padding: 16px;
+    background: #142334;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+#charpy-specimen-state {
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+/* 32. DIAGRAMAS Fe-C Y TTT/CCT */
+
+#fe-c-diagram,
+#ttt-cct-diagram,
+#thermal-history-chart {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-height: 250px;
+    background: #0b1420;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+#transformation-diagram-type,
+#transformation-steel,
+#transformation-rate,
+#fe-steel-select,
+#fe-carbon,
+#fe-temperature {
+    max-width: 100%;
+}
+
+/* 33. MICROESTRUCTURA */
+
+#microstructure-canvas {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-height: 300px;
+    background: #0b1420;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+/* 34. RESULTADOS */
+
+.viewer-card,
+.control-card,
+.result-card,
+.info-card,
+.data-card {
+    min-width: 0;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#results-table-body tr td {
+    vertical-align: middle;
+}
+
+/* 35. ACCESIBILIDAD */
+
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--blue-light);
+    outline-offset: 3px;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* 36. RESPONSIVE DE LOS NUEVOS MÓDULOS */
+
+@media (max-width: 650px) {
+    .welcome-section {
+        padding: 22px;
+        min-height: 160px;
+        align-items: flex-start;
+    }
+
+    .welcome-section h2 {
+        font-size: 25px;
+    }
+
+    .welcome-section p {
+        font-size: 10px;
+    }
+
+    .menu {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 5px;
+    }
+
+    .menu-link {
+        padding: 11px 8px;
+        font-size: 10px;
+    }
+
+    #charpy-viewer {
+        height: 320px;
+    }
+
+    #fe-c-diagram,
+    #ttt-cct-diagram,
+    #thermal-history-chart {
+        min-height: 210px;
+    }
+
+    #microstructure-canvas {
+        min-height: 240px;
+    }
+
+    table {
+        min-width: 520px;
+    }
+}
+
+@media (max-width: 400px) {
+    .main-content {
+        padding: 16px 10px;
+    }
+
+    .viewer-card,
+    .control-card,
+    .material-card,
+    .study-card {
+        padding: 14px;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

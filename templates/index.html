@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101923">
+  <meta name="description" content="STEEL LAB 3D: laboratorio virtual de tratamientos térmicos, microestructuras y ensayos mecánicos de aceros.">
+
+  <title>STEEL LAB 3D | Laboratorio Virtual de Aceros</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    .furnace-controls,
+    .module-panel,
+    .data-panel {
+      margin-top: 22px;
+      padding: 22px;
+      background: #172633;
+      border: 1px solid #344b5e;
+      border-radius: 12px;
+    }
+
+    .furnace-controls h3,
+    .module-panel h3,
+    .data-panel h3 {
+      color: #ff9b52;
+      margin: 0 0 18px;
+    }
+
+    .furnace-control-group {
+      margin-bottom: 18px;
+    }
+
+    .furnace-control-group label,
+    .field-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #dce7ef;
+      font-weight: 600;
+    }
+
+    .furnace-control-group select,
+    .module-select,
+    .module-input {
+      width: 100%;
+      padding: 12px;
+      background: #223646;
+      color: #fff;
+      border: 1px solid #496174;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .furnace-control-group p,
+    .module-help {
+      color: #b9c8d4;
+      line-height: 1.6;
+    }
+
+    #treatment-stage,
+    #furnace-temperature,
+    #process-time,
+    #furnace-status {
+      color: #ffb36f;
+      font-weight: 700;
+    }
+
+    .furnace-progress-container {
+      width: 100%;
+      height: 15px;
+      background: #0c1720;
+      border: 1px solid #496174;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    #furnace-progress,
+    #process-progress {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff6b28, #ffc15a);
+      transition: width .2s;
+    }
+
+    #furnace-progress-text,
+    #process-progress-text {
+      color: #ffb36f;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .furnace-buttons,
+    .module-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .furnace-buttons button,
+    .module-actions button {
+      cursor: pointer;
+    }
+
+    .microstructure-screen {
+      width: 100%;
+      height: 440px;
+      position: relative;
+      overflow: hidden;
+      background: #11171e;
+      border: 1px solid #344b5e;
+      border-radius: 8px;
+    }
+
+    #microstructure-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .microstructure-controls {
+      margin-top: 22px;
+    }
+
+    #microstructure-type,
+    #hardness-method {
+      width: 100%;
+      padding: 12px;
+      background: #223646;
+      color: white;
+      border: 1px solid #496174;
+      border-radius: 8px;
+    }
+
+    #microstructure-zoom {
+      width: 100%;
+      accent-color: #ff9b52;
+    }
+
+    #microstructure-name {
+      color: #ff9b52;
+    }
+
+    #microstructure-properties {
+      color: #ffb36f;
+      font-size: 13px;
+    }
+
+    .simulation-note {
+      margin-top: 14px;
+      color: #aebdca;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .module-viewer {
+      width: 100%;
+      height: 450px;
+      position: relative;
+      overflow: hidden;
+      background: #101923;
+      border-radius: 10px;
+    }
+
+    #steel-viewer {
+      height: 360px;
+    }
+
+    #tensile-viewer {
+      height: 480px;
+    }
+
+    #furnace-viewer {
+      height: 430px;
+    }
+
+    #charpy-viewer {
+      height: 500px;
+    }
+
+    .chart-card {
+      margin-top: 22px;
+      padding: 18px;
+      background: #111d28;
+      border: 1px solid #344b5e;
+      border-radius: 10px;
+    }
+
+    .chart-card canvas,
+    .diagram-canvas {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      background: #101923;
+      border-radius: 8px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      color: #b9c8d4;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .metric-card {
+      padding: 16px;
+      background: #101d28;
+      border: 1px solid #344b5e;
+      border-radius: 10px;
+    }
+
+    .metric-card span {
+      display: block;
+      color: #9fb0bf;
+      font-size: 12px;
+      margin-bottom: 7px;
+    }
+
+    .metric-card strong {
+      color: #ffb36f;
+      font-size: 20px;
+    }
+
+    .diagram-wrap {
+      padding: 16px;
+      background: #111d28;
+      border: 1px solid #344b5e;
+      border-radius: 10px;
+    }
+
+    .diagram-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 13px;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 11px;
+      border-bottom: 1px solid #344b5e;
+      text-align: left;
+    }
+
+    .comparison-table th {
+      color: #ffb36f;
+    }
+
+    .tag-didactic {
+      display: inline-block;
+      padding: 5px 9px;
+      border: 1px solid #8a633d;
+      border-radius: 20px;
+      color: #ffbd83;
+      font-size: 11px;
+    }
+
+    .sidebar .menu-link {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .microstructure-screen {
+        height: 320px;
+      }
+
+      .module-viewer {
+        height: 360px;
+      }
+
+      #steel-viewer {
+        height: 320px;
+      }
+
+      #charpy-viewer {
+        height: 400px;
+      }
+
+      .chart-header {
+        align-items: flex-start;
+      }
+    }
+  </style>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+
+<body>
+
+<div class="app-container">
+
+  <!-- MENÚ LATERAL -->
+  <aside class="sidebar">
+
+    <div class="logo">
+      <span class="logo-icon">SL</span>
+      <div>
+        <h2>STEEL LAB</h2>
+        <p>LABORATORIO 3D</p>
+      </div>
+    </div>
+
+    <nav class="menu" aria-label="Navegación principal">
+      <a href="#inicio" class="menu-link active">Inicio</a>
+      <a href="#materiales" class="menu-link">Materiales</a>
+      <a href="#modelo3d" class="menu-link">Visor 3D</a>
+      <a href="#tratamientos" class="menu-link">Tratamientos</a>
+      <a href="#furnace-section" class="menu-link">Horno 3D</a>
+      <a href="#metalografia" class="menu-link">Metalografía</a>
+      <a href="#microestructura" class="menu-link">Microestructura</a>
+      <a href="#ensayos" class="menu-link">Ensayos mecánicos</a>
+      <a href="#diagrama-fe-c" class="menu-link">Diagrama Fe-C</a>
+      <a href="#diagramas-ttt" class="menu-link">Diagramas TTT/CCT</a>
+      <a href="#resultados" class="menu-link">Resultados e informes</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <p>STEEL LAB 3D</p>
+      <span>Laboratorio virtual de ingeniería</span>
+    </div>
+
+  </aside>
+
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main-content">
+
+    <!-- INICIO -->
+    <section id="inicio" class="welcome-section">
+
+      <div>
+        <span class="section-label">LABORATORIO VIRTUAL INTEGRADO</span>
+
+        <h1>
+          Simulación y caracterización
+          <span>de aceros</span>
+        </h1>
+
+        <p>
+          Selecciona un acero, simula su tratamiento térmico,
+          estudia su microestructura y compara su respuesta
+          mecánica mediante modelos tridimensionales y
+          herramientas metalúrgicas.
+        </p>
+      </div>
+
+      <div class="status-card">
+        <span class="status-indicator"></span>
+        SISTEMA DE SIMULACIÓN
+      </div>
+
+    </section>
+
+
+    <!-- MATERIALES -->
+    <section id="materiales" class="content-section">
+
+      <div class="section-heading">
+        <span class="section-label">BASE DE DATOS</span>
+        <h2>Selección del material</h2>
+        <p>
+          La selección se comparte con los módulos de tratamiento
+          y ensayos.
+        </p>
+      </div>
+
+      <div class="material-grid">
+
+        <article
+          class="material-card selected"
+          data-steel="1020"
+          tabindex="0"
+          role="button"
+          aria-pressed="true">
+
+          <span class="material-code">AISI 1020</span>
+          <h3>Acero de bajo carbono</h3>
+          <p>Buena ductilidad y soldabilidad.</p>
+
+          <div class="material-properties">
+            <span>Carbono: 0.20 % aprox.</span>
+            <span>Aplicación: estructural</span>
+          </div>
+
+        </article>
+
+
+        <article
+          class="material-card"
+          data-steel="1045"
+          tabindex="0"
+          role="button"
+          aria-pressed="false">
+
+          <span class="material-code">AISI 1045</span>
+          <h3>Acero de medio carbono</h3>
+          <p>
+            Adecuado para componentes mecánicos y tratamientos térmicos.
+          </p>
+
+          <div class="material-properties">
+            <span>Carbono: 0.45 % aprox.</span>
+            <span>Aplicación: ejes y piezas</span>
+          </div>
+
+        </article>
+
+
+        <article
+          class="material-card"
+          data-steel="4140"
+          tabindex="0"
+          role="button"
+          aria-pressed="false">
+
+          <span class="material-code">AISI 4140</span>
+          <h3>Acero aleado Cr-Mo</h3>
+          <p>
+            Buena resistencia y templabilidad por sus elementos aleantes.
+          </p>
+
+          <div class="material-properties">
+            <span>Carbono: 0.40 % aprox.</span>
+            <span>Aplicación: piezas resistentes</span>
+          </div>
+
+        </article>
+
+      </div>
+    </section>
+
+
+    <!-- VISOR 3D -->
+    <section id="modelo3d" class="content-section">
+
+      <div class="section-heading">
+        <span class="section-label">VISUALIZACIÓN INTERACTIVA</span>
+        <h2>Modelo tridimensional del acero</h2>
+        <p>
+          Explora la probeta virtual y cambia el material desde
+          la sección anterior.
+        </p>
+      </div>
+
+      <div class="lab-grid">
+
+        <div class="viewer-card">
+
+          <div class="viewer-header">
+            <div>
+              <h3>VISOR 3D</h3>
+              <span>Probeta virtual · vista orbital</span>
+            </div>
+            <span class="viewer-status">EN VIVO</span>
+          </div>
+
+          <div id="steel-viewer" class="module-viewer">
+            <div class="loading-message">Cargando modelo 3D...</div>
+          </div>
+
+          <div class="viewer-footer">
+            <span>Rotación con mouse</span>
+            <span>Zoom disponible</span>
+          </div>
+
+        </div>
+
+
+        <div class="control-card">
+
+          <span class="section-label">MATERIAL ACTIVO</span>
+          <h3 id="selected-steel">AISI 1020</h3>
+          <p id="steel-description">Acero de bajo carbono.</p>
+
+          <div class="property-list">
+
+            <div>
+              <span>Tipo</span>
+              <strong id="steel-type">Bajo carbono</strong>
+            </div>
+
+            <div>
+              <span>Carbono aproximado</span>
+              <strong id="steel-carbon">0.20 %</strong>
+            </div>
+
+            <div>
+              <span>Elemento principal</span>
+              <strong>Hierro (Fe)</strong>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- TRATAMIENTOS TÉRMICOS -->
+    <section id="tratamientos" class="content-section">
+
+      <div class="section-heading">
+        <span class="section-label">PROCESOS METALÚRGICOS</span>
+        <h2>Tratamientos térmicos</h2>
+        <p>
+          Procesos que modifican la microestructura y las propiedades del acero.
+        </p>
+      </div>
+
+      <div class="study-grid">
+
+        <article class="study-card">
+          <h3>Recocido</h3>
+          <p>
+            Calentamiento y enfriamiento lento para favorecer
+            una estructura más blanda y dúctil.
+          </p>
+        </article>
+
+        <article class="study-card">
+          <h3>Normalizado</h3>
+          <p>
+            Austenización y enfriamiento al aire para obtener
+            una estructura más uniforme.
+          </p>
+        </article>
+
+        <article class="study-card">
+          <h3>Temple</h3>
+          <p>
+            Calentamiento y enfriamiento rápido; la respuesta
+            depende del carbono, aleación y sección.
+          </p>
+        </article>
+
+        <article class="study-card">
+          <h3>Revenido</h3>
+          <p>
+            Recalentamiento posterior al temple para ajustar
+            el equilibrio entre dureza y tenacidad.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+
+    <!-- HORNO 3D -->
+    <section id="furnace-section" class="content-section">
+
+      <div class="section-heading">
+        <span class="section-label">SIMULACIÓN TÉRMICA 3D</span>
+        <h2>Horno industrial de tratamientos térmicos</h2>
+        <p>
+          Controla los parámetros del ciclo y observa las etapas
+          de calentamiento, permanencia y enfriamiento.
+        </p>
+      </div>
+
+      <div class="viewer-card">
+
+        <div class="viewer-header">
+          <div>
+            <h3>HORNO DE TRATAMIENTO TÉRMICO</h3>
+            <span>Cámara térmica industrial · Modelo 3D</span>
+          </div>
+          <span class="viewer-status">SIMULACIÓN</span>
+        </div>
+
+        <div id="furnace-viewer" class="module-viewer">
+          <div class="loading-message">
+            Cargando horno industrial 3D...
+          </div>
+        </div>
+
+        <div class="viewer-footer">
+          <span>Rotación con mouse</span>
+          <span>Zoom interactivo</span>
+        </div>
+
+      </div>
+
+
+      <div class="control-card">
+
+        <span class="section-label">MONITOREO DEL PROCESO</span>
+        <h3>Panel de control térmico</h3>
+
+        <div class="property-list">
+
+          <div>
+            <span>Temperatura actual</span>
+            <strong id="furnace-temperature">25 °C</strong>
+          </div>
+
+          <div>
+            <span>Estado del horno</span>
+            <strong id="furnace-state">EN ESPERA</strong>
+          </div>
+
+          <div>
+            <span>Material seleccionado</span>
+            <strong id="selected-steel-furnace">AISI 1020</strong>
+          </div>
+
+        </div>
+
+
+        <div class="furnace-buttons">
+          <button id="start-furnace" class="primary-button" type="button">
+            INICIAR TRATAMIENTO
+          </button>
+
+          <button id="stop-furnace" class="secondary-button" type="button">
+            DETENER
+          </button>
+
+          <button id="furnace-door" class="secondary-button" type="button">
+            ABRIR / CERRAR PUERTA
+          </button>
+        </div>
+
+
+        <div class="furnace-controls">
+
+          <h3>Parámetros del tratamiento térmico</h3>
+
+          <div class="furnace-control-group">
+            <label for="heat-treatment">Tipo de tratamiento</label>
+
+            <select id="heat-treatment">
+              <option value="recocido">Recocido</option>
+              <option value="normalizado">Normalizado</option>
+              <option value="temple">Temple</option>
+              <option value="revenido">Revenido</option>
+            </select>
+          </div>
+
+
+          <div class="furnace-control-group">
+            <label for="treatment-description">Descripción</label>
+            <p id="treatment-description">
+              Calentamiento seguido de enfriamiento lento y controlado.
+            </p>
+          </div>
+
+
+          <div class="furnace-control-group">
+            <label for="treatment-stage">Etapa del proceso</label>
+            <p id="treatment-stage">Preparado para iniciar</p>
+          </div>
+
+
+          <div class="furnace-control-group">
+            <label for="target-temperature">Temperatura objetivo</label>
+
+            <select id="target-temperature">
+              <option value="400">400 °C</option>
+              <option value="500">500 °C</option>
+              <option value="600">600 °C</option>
+              <option value="700" selected>700 °C</option>
+              <option value="800">800 °C</option>
+              <option value="850">850 °C</option>
+              <option value="900">900 °C</option>
+            </select>
+          </div>
+
+
+          <div class="furnace-control-group">
+            <label for="heating-speed">Velocidad de calentamiento</label>
+
+            <select id="heating-speed">
+              <option value="0.5">Lenta</option>
+              <option value="1" selected>Normal</option>
+              <option value="2">Rápida</option>
+            </select>
+          </div>
+
+
+          <div class="furnace-control-group">
+            <label for="hold-time">Tiempo de permanencia</label>
+
+            <select id="hold-time">
+              <option value="5">5 segundos</option>
+              <option value="10" selected>10 segundos</option>
+              <option value="15">15 segundos</option>
+              <option value="20">20 segundos</option>
+              <option value="30">30 segundos</option>
+            </select>
+
+            <p>Duración acelerada para fines demostrativos.</p>
+          </div>
+
+
+          <div class="furnace-control-group">
+            <label for="cooling-method">Método de enfriamiento</label>
+
+            <select id="cooling-method">
+              <option value="auto" selected>Automático según tratamiento</option>
+              <option value="slow">Lento · en horno</option>
+              <option value="air">Al aire</option>
+              <option value="fast">Rápido · temple</option>
+            </select>
+          </div>
+
+
+          <div class="furnace-control-group">
+            <label>Progreso del calentamiento</label>
+
+            <div class="furnace-progress-container">
+              <div id="furnace-progress"></div>
+            </div>
+
+            <p id="furnace-progress-text">0 %</p>
+          </div>
+
+
+          <div class="furnace-control-group">
+            <label for="process-time">Tiempo de proceso</label>
+            <p id="process-time">00:00</p>
+          </div>
+
+
+          <div class="furnace-control-group">
+            <label>Progreso del tratamiento completo</label>
+
+            <div class="furnace-progress-container">
+              <div id="process-progress"></div>
+            </div>
+
+            <p id="process-progress-text">0 %</p>
+          </div>
+
+        </div>
+
+        <p id="furnace-status">Sistema preparado para iniciar.</p>
+
+        <p class="simulation-note">
+          Los tiempos, temperaturas y velocidades de esta experiencia
+          son parámetros didácticos acelerados. No representan mediciones
+          experimentales ni condiciones universales de tratamiento industrial.
+        </p>
+
+      </div>
+
+
+      <div class="chart-card">
+
+        <div class="chart-header">
+          <div>
+            <span class="section-label">HISTORIAL TÉRMICO</span>
+            <h3>Temperatura durante el ciclo</h3>
+          </div>
+
+          <span class="tag-didactic">Datos de simulación</span>
+        </div>
+
+        <canvas
+          id="thermal-history-chart"
+          class="diagram-canvas"
+          width="900"
+          height="330">
+        </canvas>
+
+      </div>
+
+    </section>
+
+
+    <!-- METALOGRAFÍA -->
+    <section id="metalografia" class="content-section">
+
+      <div class="section-heading">
+        <span class="section-label">PREPARACIÓN METALOGRÁFICA</span>
+        <h2>Laboratorio de metalografía</h2>
+        <p>
+          Recorrido didáctico por las etapas necesarias para preparar
+          una muestra antes de observarla al microscopio.
+        </p>
+      </div>
+
+      <div class="study-grid">
+
+        <article class="study-card">
+          <h3>01 · Corte</h3>
+          <p>
+            Obtención de una sección representativa de la probeta,
+            evitando alterar excesivamente la zona de interés.
+          </p>
+        </article>
+
+        <article class="study-card">
+          <h3>02 · Montaje</h3>
+          <p>
+            Fijación de la muestra para facilitar su manipulación
+            durante la preparación.
+          </p>
+        </article>
+
+        <article class="study-card">
+          <h3>03 · Desbaste y pulido</h3>
+          <p>
+            Reducción progresiva de rayas y preparación
+            de una superficie reflectante.
+          </p>
+        </article>
+
+        <article class="study-card">
+          <h3>04 · Ataque químico</h3>
+          <p>
+            Revelado de límites de grano y constituyentes mediante
+            un reactivo apropiado para el material.
+          </p>
+        </article>
+
+      </div>
+
+      <p class="simulation-note">
+        Este apartado es una guía de procedimiento; no sustituye
+        una preparación física ni prescribe reactivos, concentraciones
+        o tiempos de laboratorio.
+      </p>
+
+    </section>
+
+
+    <!-- MICROESTRUCTURA -->
+    <section id="microestructura" class="content-section">
+
+      <div class="section-heading">
+        <span class="section-label">METALOGRAFÍA DIGITAL</span>
+        <h2>Microscopio metalográfico</h2>
+        <p>
+          Explora las representaciones didácticas de las fases
+          y microestructuras del acero.
+        </p>
+      </div>
+
+
+      <div class="viewer-card">
+
+        <div class="viewer-header">
+          <div>
+            <h3>MICROSCOPIO DIGITAL</h3>
+            <span>Visualización metalográfica interactiva</span>
+          </div>
+
+          <span class="viewer-status">EN VIVO</span>
+        </div>
+
+        <div class="microstructure-screen">
+          <canvas id="microstructure-canvas"></canvas>
+        </div>
+
+        <div class="viewer-footer">
+          <span>Ampliación visual ajustable</span>
+          <span>Análisis de fases</span>
+        </div>
+
+      </div>
+
+
+      <div class="control-card microstructure-controls">
+
+        <span class="section-label">PANEL DE ANÁLISIS</span>
+        <h3>Configuración microscópica</h3>
+
+        <div class="furnace-control-group">
+          <label for="microstructure-type">
+            Seleccionar microestructura
+          </label>
+
+          <select id="microstructure-type">
+            <option value="ferrita">Ferrita</option>
+            <option value="perlita">Perlita</option>
+            <option value="austenita">Austenita</option>
+            <option value="martensita">Martensita</option>
+            <option value="bainita">Bainita</option>
+          </select>
+        </div>
+
+
+        <div class="furnace-control-group">
+          <label for="microstructure-zoom">Aumento visual</label>
+
+          <input
+            type="range"
+            id="microstructure-zoom"
+            min="70"
+            max="180"
+            value="100"
+            step="5">
+
+          <p>
+            Aumento:
+            <strong id="microstructure-zoom-value">100 %</strong>
+          </p>
+        </div>
+
+
+        <div class="property-list">
+          <div>
+            <span>Material seleccionado</span>
+            <strong id="microstructure-material">AISI 1020</strong>
+          </div>
+
+          <div>
+            <span>Origen de la imagen</span>
+            <strong>Representación sintética</strong>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="control-card">
+
+        <span class="section-label">INFORMACIÓN METALÚRGICA</span>
+        <h3 id="microstructure-name">Ferrita</h3>
+
+        <p id="microstructure-description">
+          Fase de hierro alfa con estructura cristalina cúbica
+          centrada en el cuerpo.
+        </p>
+
+        <div class="property-list">
+
+          <div>
+            <span>Características</span>
+            <strong id="microstructure-properties">Blanda · Dúctil</strong>
+          </div>
+
+          <div>
+            <span>Tratamiento asociado</span>
+            <strong id="microstructure-treatment">Selección didáctica</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+      <p class="simulation-note">
+        Las imágenes son representaciones gráficas sintéticas,
+        no micrografías experimentales reales. La estructura real
+        depende de composición, temperatura, tiempo, velocidad
+        de enfriamiento y condiciones de la muestra.
+      </p>
+
+    </section>
+
+
+    <!-- ENSAYOS MECÁNICOS -->
+    <section id="ensayos" class="content-section">
+
+      <div class="section-heading">
+        <span class="section-label">CARACTERIZACIÓN MECÁNICA</span>
+        <h2>Ensayos mecánicos</h2>
+        <p>
+          Ejecuta las pruebas virtuales y compara las respuestas
+          estimadas de cada acero.
+        </p>
+      </div>
+
+
+      <!-- TRACCIÓN -->
+      <article class="control-card" id="tensile-section">
+
+        <span class="section-label">ENSAYO MECÁNICO 01</span>
+        <h3>Ensayo de tracción</h3>
+
+        <p>
+          Máquina universal, deformación de probeta y curva
+          esfuerzo-deformación.
+        </p>
+
+
+        <div class="viewer-card">
+
+          <div class="viewer-header">
+            <div>
+              <h3>MÁQUINA UNIVERSAL DE ENSAYOS</h3>
+              <span>Tracción · Simulación 3D</span>
+            </div>
+
+            <span class="viewer-status">LISTA</span>
+          </div>
+
+          <div id="tensile-viewer" class="module-viewer">
+            <div class="loading-message">
+              Cargando máquina de tracción...
+            </div>
+          </div>
+
+          <div class="viewer-footer">
+            <span>Rotación con mouse</span>
+            <span>Zoom interactivo</span>
+          </div>
+
+        </div>
+
+
+        <div class="module-panel">
+
+          <h3>Panel de control</h3>
+
+          <p>
+            Material seleccionado:
+            <strong id="tensile-material">AISI 1020</strong>
+          </p>
+
+          <div class="module-actions">
+
+            <button id="start-tensile" class="primary-button" type="button">
+              INICIAR ENSAYO
+            </button>
+
+            <button id="reset-tensile" class="secondary-button" type="button">
+              REINICIAR
+            </button>
+
+          </div>
+
+          <p id="tensile-status">Sistema preparado para iniciar.</p>
+
+
+          <div class="chart-card">
+
+            <div class="chart-header">
+              <div>
+                <span class="section-label">ANÁLISIS MECÁNICO</span>
+                <h3>Curva esfuerzo-deformación</h3>
+              </div>
+
+              <span class="tag-didactic">Simulación en vivo</span>
+            </div>
+
+            <canvas id="tensile-chart" width="900" height="420"></canvas>
+
+            <div class="chart-legend">
+              <span>Esfuerzo (MPa)</span>
+              <span>Deformación (%)</span>
+            </div>
+
+          </div>
+
+
+          <div class="property-list">
+
+            <div>
+              <span>Esfuerzo actual</span>
+              <strong id="current-stress">0 MPa</strong>
+            </div>
+
+            <div>
+              <span>Deformación actual</span>
+              <strong id="current-strain">0 %</strong>
+            </div>
+
+            <div>
+              <span>Estado del material</span>
+              <strong id="material-state">Sin ensayo</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+
+      <!-- DUREZA -->
+      <article class="control-card" id="hardness-section">
+
+        <span class="section-label">ENSAYO MECÁNICO 02</span>
+        <h3>Ensayo de dureza</h3>
+
+        <p>
+          Evaluación virtual mediante penetración con los métodos
+          Rockwell, Brinell y Vickers.
+        </p>
+
+
+        <div class="viewer-card">
+
+          <div class="viewer-header">
+            <div>
+              <h3>MÁQUINA DE DUREZA</h3>
+              <span>Indentación · Simulación 3D</span>
+            </div>
+
+            <span class="viewer-status">LISTA</span>
+          </div>
+
+          <div id="hardness-viewer" class="module-viewer">
+            <div class="loading-message">
+              Cargando máquina de dureza...
+            </div>
+          </div>
+
+          <div class="viewer-footer">
+            <span>Rotación con mouse</span>
+            <span>Zoom interactivo</span>
+          </div>
+
+        </div>
+
+
+        <div class="module-panel">
+
+          <h3>Panel de control</h3>
+
+          <label class="field-label" for="hardness-method">
+            Método de ensayo
+          </label>
+
+          <select id="hardness-method" class="module-select">
+            <option value="rockwell">Rockwell</option>
+            <option value="brinell">Brinell</option>
+            <option value="vickers">Vickers</option>
+          </select>
+
+
+          <div class="property-list">
+
+            <div>
+              <span>Material seleccionado</span>
+              <strong id="hardness-material">AISI 1020</strong>
+            </div>
+
+            <div>
+              <span>Tipo de indentador</span>
+              <strong id="hardness-indenter">Cono de diamante</strong>
+            </div>
+
+            <div>
+              <span>Estado del ensayo</span>
+              <strong id="hardness-state">Preparado</strong>
+            </div>
+
+          </div>
+
+
+          <div class="module-actions">
+
+            <button id="start-hardness" class="primary-button" type="button">
+              INICIAR ENSAYO
+            </button>
+
+            <button id="reset-hardness" class="secondary-button" type="button">
+              REINICIAR
+            </button>
+
+          </div>
+
+          <p id="hardness-status">Sistema preparado para iniciar.</p>
+
+
+          <div
+            id="hardness-result"
+            class="metric-card"
+            style="display:none; margin-top:18px">
+
+            <span>Resultado de dureza</span>
+            <strong id="hardness-value">--</strong>
+
+            <p class="simulation-note">
+              Resultado ilustrativo de simulación.
+            </p>
+
+          </div>
+
+        </div>
+
+      </article>
+
+
+      <!-- CHARPY -->
+      <article class="control-card" id="charpy-section">
+
+        <span class="section-label">ENSAYO MECÁNICO 03</span>
+        <h3>Ensayo de impacto Charpy</h3>
+
+        <p>
+          Simulación de un péndulo que impacta una probeta entallada.
+          Se estimará la energía absorbida a partir de la diferencia
+          de energía potencial del péndulo.
+        </p>
+
+
+        <div class="viewer-card">
+
+          <div class="viewer-header">
+            <div>
+              <h3>MÁQUINA PÉNDULO CHARPY</h3>
+              <span>Impacto y fractura · Modelo 3D</span>
+            </div>
+
+            <span class="viewer-status">LISTA</span>
+          </div>
+
+          <div id="charpy-viewer" class="module-viewer">
+            <div class="loading-message">
+              Cargando péndulo Charpy 3D...
+            </div>
+          </div>
+
+          <div class="viewer-footer">
+            <span>Vista orbital</span>
+            <span>Péndulo interactivo</span>
+          </div>
+
+        </div>
+
+
+        <div class="module-panel">
+
+          <h3>Parámetros del ensayo</h3>
+
+          <div class="diagram-controls">
+
+            <div>
+              <label class="field-label" for="charpy-material">
+                Material
+              </label>
+
+              <select id="charpy-material" class="module-select">
+                <option value="selected">Usar acero seleccionado</option>
+                <option value="1020">AISI 1020</option>
+                <option value="1045">AISI 1045</option>
+                <option value="4140">AISI 4140</option>
+              </select>
+            </div>
+
+
+            <div>
+              <label class="field-label" for="charpy-temperature">
+                Temperatura de ensayo
+              </label>
+
+              <select id="charpy-temperature" class="module-select">
+                <option value="20">20 °C</option>
+                <option value="0">0 °C</option>
+                <option value="-20">-20 °C</option>
+                <option value="-40">-40 °C</option>
+              </select>
+            </div>
+
+
+            <div>
+              <label class="field-label" for="charpy-mass">
+                Masa del péndulo (kg)
+              </label>
+
+              <input
+                id="charpy-mass"
+                class="module-input"
+                type="number"
+                min="1"
+                max="100"
+                step="0.5"
+                value="20">
+            </div>
+
+
+            <div>
+              <label class="field-label" for="charpy-length">
+                Longitud del brazo (m)
+              </label>
+
+              <input
+                id="charpy-length"
+                class="module-input"
+                type="number"
+                min="0.2"
+                max="2"
+                step="0.05"
+                value="0.75">
+            </div>
+
+
+            <div>
+              <label class="field-label" for="charpy-angle">
+                Ángulo inicial (°)
+              </label>
+
+              <input
+                id="charpy-angle"
+                class="module-input"
+                type="number"
+                min="30"
+                max="150"
+                step="1"
+                value="120">
+            </div>
+
+          </div>
+
+
+          <div class="module-actions">
+
+            <button id="start-charpy" class="primary-button" type="button">
+              LIBERAR PÉNDULO
+            </button>
+
+            <button id="reset-charpy" class="secondary-button" type="button">
+              REINICIAR
+            </button>
+
+          </div>
+
+
+          <p id="charpy-status">Sistema preparado para iniciar.</p>
+
+
+          <div class="module-grid">
+
+            <div class="metric-card">
+              <span>Energía absorbida</span>
+              <strong id="charpy-energy">-- J</strong>
+            </div>
+
+            <div class="metric-card">
+              <span>Ángulo de salida</span>
+              <strong id="charpy-exit-angle">-- °</strong>
+            </div>
+
+            <div class="metric-card">
+              <span>Estado de probeta</span>
+              <strong id="charpy-specimen-state">Sin impacto</strong>
+            </div>
+
+            <div class="metric-card">
+              <span>Material</span>
+              <strong id="charpy-result-material">AISI 1020</strong>
+            </div>
+
+          </div>
+
+
+          <div id="charpy-result" class="data-panel" hidden>
+            <h3>Resultado del impacto</h3>
+            <p id="charpy-result-text">Resultado pendiente.</p>
+          </div>
+
+
+          <p class="simulation-note">
+            La máquina, el comportamiento de fractura y los resultados
+            son didácticos. La energía calculada es una estimación del
+            modelo, no un valor certificado ni un ensayo normalizado real.
+            Para una prueba normalizada deben definirse dimensiones de
+            probeta, geometría de entalla, calibración y procedimiento aplicable.
+          </p>
+
+        </div>
+
+      </article>
+
+    </section>
+
+
+    <!-- DIAGRAMA HIERRO-CARBONO -->
+    <section id="diagrama-fe-c" class="content-section">
+
+      <div class="section-heading">
+        <span class="section-label">FUNDAMENTOS METALÚRGICOS</span>
+        <h2>Diagrama de equilibrio hierro-carbono (Fe-C)</h2>
+        <p>
+          Herramienta didáctica para ubicar regiones, fases y
+          transformaciones en función del contenido de carbono
+          y la temperatura.
+        </p>
+      </div>
+
+
+      <div class="diagram-wrap">
+
+        <div class="diagram-controls">
+
+          <div>
+            <label class="field-label" for="fe-carbon">
+              Contenido de carbono (% C)
+            </label>
+
+            <input
+              id="fe-carbon"
+              class="module-input"
+              type="number"
+              min="0"
+              max="6.67"
+              step="0.01"
+              value="0.20">
+          </div>
+
+
+          <div>
+            <label class="field-label" for="fe-temperature">
+              Temperatura (°C)
+            </label>
+
+            <input
+              id="fe-temperature"
+              class="module-input"
+              type="number"
+              min="0"
+              max="1600"
+              step="10"
+              value="750">
+          </div>
+
+
+          <div>
+            <label class="field-label" for="fe-steel-select">
+              Acero de referencia
+            </label>
+
+            <select id="fe-steel-select" class="module-select">
+              <option value="1020">AISI 1020</option>
+              <option value="1045">AISI 1045</option>
+              <option value="4140">AISI 4140 (referencia aproximada)</option>
+            </select>
+          </div>
+
+        </div>
+
+
+        <canvas
+          id="fe-c-diagram"
+          class="diagram-canvas"
+          width="1000"
+          height="560">
+        </canvas>
+
+        <p id="fe-c-reading" class="module-help">
+          Selecciona composición y temperatura para consultar una lectura orientativa.
+        </p>
+
+        <p class="simulation-note">
+          Esquema educativo simplificado del sistema metaestable Fe-Fe₃C.
+          No sustituye un diagrama termodinámico de precisión ni representa
+          todas las composiciones de elementos aleantes del AISI 4140.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- DIAGRAMAS TTT Y CCT -->
+    <section id="diagramas-ttt" class="content-section">
+
+      <div class="section-heading">
+        <span class="section-label">CINÉTICA DE TRANSFORMACIÓN</span>
+        <h2>Diagramas TTT y CCT</h2>
+        <p>
+          Consulta esquemas de transformación isotérmica (TTT)
+          y enfriamiento continuo (CCT).
+        </p>
+      </div>
+
+
+      <div class="diagram-wrap">
+
+        <div class="diagram-controls">
+
+          <div>
+            <label class="field-label" for="transformation-diagram-type">
+              Tipo de diagrama
+            </label>
+
+            <select id="transformation-diagram-type" class="module-select">
+              <option value="ttt">TTT · Transformación isotérmica</option>
+              <option value="cct">CCT · Enfriamiento continuo</option>
+            </select>
+          </div>
+
+
+          <div>
+            <label class="field-label" for="transformation-steel">
+              Acero de referencia
+            </label>
+
+            <select id="transformation-steel" class="module-select">
+              <option value="1020">AISI 1020</option>
+              <option value="1045">AISI 1045</option>
+              <option value="4140">AISI 4140</option>
+            </select>
+          </div>
+
+
+          <div>
+            <label class="field-label" for="transformation-rate">
+              Velocidad de enfriamiento
+            </label>
+
+            <select id="transformation-rate" class="module-select">
+              <option value="slow">Lenta</option>
+              <option value="medium" selected>Media</option>
+              <option value="fast">Rápida</option>
+            </select>
+          </div>
+
+        </div>
+
+
+        <canvas
+          id="ttt-cct-diagram"
+          class="diagram-canvas"
+          width="1000"
+          height="560">
+        </canvas>
+
+        <p id="ttt-cct-reading" class="module-help">
+          Selecciona las opciones para visualizar una curva didáctica.
+        </p>
+
+        <p class="simulation-note">
+          Las curvas mostradas serán esquemáticas. Las posiciones reales
+          de las curvas TTT/CCT dependen de la composición exacta, tamaño
+          de grano austenítico y condiciones del material; no deben
+          utilizarse para diseñar un tratamiento industrial.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- RESULTADOS -->
+    <section id="resultados" class="content-section">
+
+      <div class="section-heading">
+        <span class="section-label">ANÁLISIS DE DATOS</span>
+        <h2>Resultados, comparación e informes</h2>
+        <p>
+          Consolida los resultados generados por las simulaciones
+          para comparar materiales y tratamientos.
+        </p>
+      </div>
+
+
+      <div class="module-grid">
+
+        <div class="metric-card">
+          <span>Material activo</span>
+          <strong id="summary-material">AISI 1020</strong>
+        </div>
+
+        <div class="metric-card">
+          <span>Tratamiento seleccionado</span>
+          <strong id="summary-treatment">Recocido</strong>
+        </div>
+
+        <div class="metric-card">
+          <span>Último ensayo ejecutado</span>
+          <strong id="summary-last-test">Ninguno</strong>
+        </div>
+
+        <div class="metric-card">
+          <span>Estado de simulación</span>
+          <strong id="summary-status">Preparado</strong>
+        </div>
+
+      </div>
+
+
+      <div class="data-panel">
+
+        <h3>Tabla comparativa de ensayos</h3>
+
+        <div style="overflow-x:auto">
+
+          <table class="comparison-table">
+
+            <thead>
+              <tr>
+                <th>Ensayo</th>
+                <th>Material</th>
+                <th>Resultado</th>
+                <th>Unidad</th>
+                <th>Tipo de dato</th>
+              </tr>
+            </thead>
+
+            <tbody id="results-table-body">
+              <tr>
+                <td colspan="5">
+                  Todavía no se han registrado resultados.
+                  Ejecuta una simulación.
+                </td>
+              </tr>
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        <div class="module-actions">
+
+          <button id="export-results" class="primary-button" type="button">
+            EXPORTAR INFORME
+          </button>
+
+          <button id="clear-results" class="secondary-button" type="button">
+            LIMPIAR RESULTADOS
+          </button>
+
+        </div>
+
+        <p id="results-status" class="module-help">
+          Los resultados se mostrarán aquí cuando los ensayos estén conectados.
+        </p>
+
+      </div>
+
+
+      <p class="simulation-note">
+        Los informes distinguirán claramente valores simulados de
+        mediciones experimentales. No se deben presentar resultados
+        virtuales como datos obtenidos en una máquina física.
+      </p>
+
+    </section>
+
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="main-footer">
+
+      <p>
+        STEEL LAB 3D · Laboratorio virtual de tratamientos térmicos
+        y caracterización de aceros
+      </p>
+
+      <p class="simulation-note">
+        Proyecto académico de simulación · No sustituye ensayos
+        normalizados ni certificaciones de materiales.
+      </p>
+
+    </footer>
+
+  </main>
+
+</div>
+
+
+<!-- MÓDULOS JAVASCRIPT EXISTENTES -->
+<script type="module" src="{{ url_for('static', filename='js/visor3d.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/ensayo_traccion.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/ensayo_dureza.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/tratamiento_termico.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/microestructura.js') }}"></script>
+
+
+<!-- MÓDULOS NUEVOS: SE IMPLEMENTARÁN DESPUÉS -->
+<script type="module" src="{{ url_for('static', filename='js/ensayo_charpy.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/diagramas.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/resultados.js') }}"></script>
+
+
+<!-- SELECTOR GENERAL DE MATERIAL -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const cards = document.querySelectorAll(".material-card[data-steel]");
+
+  const materials = {
+    "1020": {
+      name: "AISI 1020",
+      description: "Acero de bajo carbono.",
+      type: "Bajo carbono",
+      carbon: "0.20 %"
+    },
+
+    "1045": {
+      name: "AISI 1045",
+      description: "Acero de medio carbono.",
+      type: "Medio carbono",
+      carbon: "0.45 %"
+    },
+
+    "4140": {
+      name: "AISI 4140",
+      description: "Acero aleado al cromo-molibdeno.",
+      type: "Acero aleado",
+      carbon: "0.40 %"
+    }
+  };
+
+
+  function setText(id, value) {
+    const element = document.getElementById(id);
+
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+
+  function selectSteel(code) {
+
+    const material = materials[code];
+
+    if (!material) {
+      return;
+    }
+
+
+    // Actualizar tarjetas
+    cards.forEach(card => {
+
+      const active = card.dataset.steel === code;
+
+      card.classList.toggle("selected", active);
+
+      card.setAttribute(
+        "aria-pressed",
+        active ? "true" : "false"
+      );
+
+    });
+
+
+    // Actualizar información principal
+    setText("selected-steel", material.name);
+    setText("steel-description", material.description);
+    setText("steel-type", material.type);
+    setText("steel-carbon", material.carbon);
+
+
+    // Actualizar material en los módulos
+    [
+      "tensile-material",
+      "hardness-material",
+      "selected-steel-furnace",
+      "microstructure-material",
+      "charpy-result-material",
+      "summary-material"
+    ].forEach(id => {
+      setText(id, material.name);
+    });
+
+
+    // Actualizar material de Charpy si usa el seleccionado
+    const charpySelect = document.getElementById("charpy-material");
+
+    if (charpySelect && charpySelect.value === "selected") {
+      setText("charpy-result-material", material.name);
+    }
+
+
+    // Actualizar diagramas
+    const feSteel = document.getElementById("fe-steel-select");
+    const transSteel = document.getElementById("transformation-steel");
+
+    if (feSteel) {
+      feSteel.value = code;
+    }
+
+    if (transSteel) {
+      transSteel.value = code;
+    }
+
+
+    // Notificar al resto de módulos
+    document.dispatchEvent(
+      new CustomEvent("steelChanged", {
+        detail: {
+          code,
+          ...material
+        }
+      })
+    );
+
+    console.log("Acero seleccionado:", code);
+
+  }
+
+
+  // Eventos de selección con mouse y teclado
+  cards.forEach(card => {
+
+    card.addEventListener("click", () => {
+      selectSteel(card.dataset.steel);
+    });
+
+
+    card.addEventListener("keydown", event => {
+
+      if (event.key === "Enter" || event.key === " ") {
+
+        event.preventDefault();
+
+        selectSteel(card.dataset.steel);
+
+      }
+
+    });
+
+  });
+
+
+  // Material inicial
+  selectSteel("1020");
+
+});
+</script>
+
+</body>
+</html>
